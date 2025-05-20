@@ -14,14 +14,20 @@
 ## 📁 Project Structure
 ```plaintext
 ProjectSinister/
-├── commands/ # Slash command definitions
-├── events/ # Event handlers
-├── database/ # MongoDB schemas and models
-├── utils/ # Utility functions
-├── .env # Environment variables (not committed)
-├── .gitignore # Files and directories to ignore in Git
-├── index.js # Main entry point
-└── package.json # Project metadata and scripts
+├── ai/                   # AI-related functionalities
+├── commands/             # Slash command definitions
+│   └── utility/          # Utility commands
+├── db/                   # Database models and schemas
+├── handlers/             # Event and command handlers
+├── .gitignore            # Git ignore file
+├── LICENSE               # License information
+├── README.md             # Project documentation
+├── cleanreset.js         # Script to reset commands
+├── deploy.js             # Command deployment script
+├── index.js              # Main entry point of the bot
+├── package-lock.json     # NPM lock file
+├── package.json          # Project metadata and dependencies
+└── testdeploy.js         # Test deployment script
 ```
 
 ## 📄 License
