@@ -3,4 +3,4 @@ node_modules/
 .vscode/
 
 #sensitive environment file
-.env
+config.json

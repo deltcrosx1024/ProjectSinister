@@ -5,8 +5,7 @@ const path = require('path'); //setup path module
 const db = require('./db/dbconnect.js'); //connect database
 
 //setup the token of both Discord Bot and OpenAI API Key
-require('dotenv').config();
-const discord_token = process.env.TOKEN
+const { token } = require('./config.json');
 
 //this line of code will be starting point for interaction part
 discord_clients.commands = new Collection();
@@ -52,4 +51,4 @@ discord_clients.on('messageCreate', async message => {
     if (message.channel.id !== process.env.CHANNELID) return console.log("Incorrect Channel");
 });
 
-discord_clients.login(discord_token);
+discord_clients.login(token);
