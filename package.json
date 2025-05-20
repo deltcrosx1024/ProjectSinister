@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.5.0",
+    "joi": "^17.13.3",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.2",
+    "openai": "^4.96.0",
+    "openai-agents": "^1.1.0"
+  }
+}

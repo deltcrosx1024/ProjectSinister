@@ -1,0 +1,5 @@
+#node dependencies folder
+node_modules/
+
+#sensitive environment file
+.env
