@@ -1,5 +1,6 @@
 #node dependencies folder
 node_modules/
+.vscode/
 
 #sensitive environment file
 .env
