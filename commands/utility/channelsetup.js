@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName('chanelsetup')
+    .setName('channelsetup')
     .setDescription('setup channel for AI Response')
     .addStringOption(option =>
         option.setName('channelid')
@@ -11,9 +11,10 @@ module.exports = {
         .setRequired(true)
     ),
     async execute(interaction) {
-        let channelid = interaction.option.getString('channelid');
+        let channelid = interaction.options.getString('channelid');
         let guildid = interaction.guildId;
 
         await console.log("GuildId", guildid);
+        await console.log("ChannelId", channelid);
     }
 }
