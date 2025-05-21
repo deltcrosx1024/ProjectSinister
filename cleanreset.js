@@ -10,6 +10,7 @@ const rest = new REST({ version: '10' }).setToken(token);
 
         for (const command of commands) {
             await rest.delete(Routes.applicationCommand(appid, command.id));
+            await rest.delete(Routes.applicationGuildCommand(appid));
             console.log(`🗑 Deleted command ${command.name}`);
         }
 

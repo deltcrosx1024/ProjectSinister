@@ -2,10 +2,13 @@ const {Client, GatewayIntentBits, Collection, messageLink} = require('discord.js
 const discord_clients = new Client({ intents: [3276799] }); //set up intents for bot to run flawlessly with administrative permissions
 const fs = require('fs'); //setup file system module
 const path = require('path'); //setup path module
-const db = require('./db/dbconnect.js'); //connect database
+const searchInDatabase = require('./db/dbsearch'); //connect database
+const dbconnect = require('./db/dbconnect.js');
 
 //setup the token of both Discord Bot and OpenAI API Key
 const { token } = require('./config.json');
+
+dbconnect();
 
 //this line of code will be starting point for interaction part
 discord_clients.commands = new Collection();
@@ -48,7 +51,21 @@ discord_clients.on('interactionCreate', async interaction => {
 
 //AI Interactions
 discord_clients.on('messageCreate', async message => {
-    if (message.channel.id !== process.env.CHANNELID) return console.log("Incorrect Channel");
+	const input = {
+		dbname: "aibotcontainer",
+		collectionName: "client_id",
+		query: {
+			guildId: message.guild?.id,
+			channelid: message.channel?.id
+		}
+	}
+	let results = await searchInDatabase(input);
+    if (results.success && result.data.length > 0) {
+		//main AI code
+	}
+	else {
+		console.log("Incorrect channel");
+	}
 });
 
 discord_clients.login(token);

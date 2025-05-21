@@ -1,28 +1,25 @@
  // saveToMongo.js
 const mongoose = require('mongoose');
+const Joi = require('joi');
+const dbconnect = require('./dbconnect');
 
 // Define the schema
 const ServerConfigSchema = new mongoose.Schema({
-    guildid: int,
-    channelid: int,
+    guildid: { type: String, required: true },
+    channelid: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
 });
 
-const AdditionalSchema = new mongoose.Schema({
-    userId: int,
-    username: String,
-    userpermission: int,
-    timestamp: { type: Date, default: Date.now }
-});
-
 // Create the model
-const serversetupinput = mongoose.model('ServerInput', ServerConfigSchema);
-const userpermissioninput = mongoose.model('UserPerm', AdditionalSchema);
+let serversetupinput = mongoose.model('ServerInput', ServerConfigSchema);
 
 // The function to be called from your slash command
 async function SaveServerInput({ guildid, channelid }) {
     try {
-        const entry = new serversetupinput.findOneAndUpdate(
+        await dbconnect();
+        console.log('mongoose.connection.readyState:', mongoose.connection.readyState);
+        await serversetupinput.findOneAndUpdate(
+        
             { guildid },
             { 
                 channelid,
@@ -33,27 +30,8 @@ async function SaveServerInput({ guildid, channelid }) {
         return { success: true, message: 'Data saved successfully.' };
     } catch (error) {
         console.error('MongoDB Save or Update Error', error);
-        return { success: false, message: 'Failed to save data.', data: entry };
+        return { success: false, message: 'Failed to save data.'};
     }
 };
 
-async function SaveUserPermission({ userId, username, userpermission }) {
-    try {
-        const entry = new userpermissioninput.findOneAndUpdate(
-            { userId },
-            { 
-                username,
-                userpermission,
-                timestamp: Date.now()
-            },
-            { new: true, upsert: true }
-        );
-        return { success: true, message: 'Permission Updated'}
-    } catch (error) {
-        console.error('MongoDB Save or Update Error', error);
-        return { success: false, message: 'Failed to save data.', data: entry };
-    }
-}
-
 module.exports = SaveServerInput;
-module.exports = SaveUserPermission;

@@ -1,22 +1,16 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const { mongodb_uri } = require('../config.json');
+const mongoose = require('mongoose');
+const {mongodb_uri} = require('../config.json');
 
-const Client = new MongoClient(mongodb_uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
+let isConnected = false;
 
-async function run() {
-    try {
-        await Client.connect();
-        await Client.db("aibotcontainer");
-        console.log("Connected to Database");
-    } finally {
-        await Client.close();
-    }
-}
+const dbconnect = async () => {
+    if (isConnected) return mongoose;
 
-run().catch(console.dir);
+    await mongoose.connect(mongodb_uri);
+
+    isConnected = true;
+    console.log("Connected to Database");
+    return mongoose;
+};
+
+module.exports = dbconnect;
