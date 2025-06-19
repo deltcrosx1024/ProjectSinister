@@ -2,8 +2,9 @@ const {Client, GatewayIntentBits, Collection, messageLink} = require('discord.js
 const discord_clients = new Client({ intents: [3276799] }); //set up intents for bot to run flawlessly with administrative permissions
 const fs = require('fs'); //setup file system module
 const path = require('path'); //setup path module
-const searchInDatabase = require('./db/dbsearch'); //connect database
+const dbsearch = require('./db/dbsearch'); //connect database
 const dbconnect = require('./db/dbconnect.js');
+const mongoose = require('mongoose');
 
 //setup the token of both Discord Bot and OpenAI API Key
 const { token } = require('./config.json');
@@ -49,22 +50,37 @@ discord_clients.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 });
 
+const ServerInputSchema = new mongoose.Schema({
+  guildid: { type: String, required: true },
+  channelid: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }
+});
+
+const Model = mongoose.model('ServerFetch', ServerInputSchema);
+
 //AI Interactions
 discord_clients.on('messageCreate', async message => {
-	const input = {
-		dbname: "aibotcontainer",
-		collectionName: "client_id",
-		query: {
-			guildId: message.guild?.id,
-			channelid: message.channel?.id
-		}
-	}
-	let results = await searchInDatabase(input);
-    if (results.success && result.data.length > 0) {
-		//main AI code
-	}
-	else {
-		console.log("Incorrect channel");
+	try {
+		await dbconnect();
+
+		let guildid = message.guild.id;
+
+		const collections = database.collection('ServerInputs');
+
+		// Find the document where guildid matches, return only channelid
+		const result = await dbconnect(collections).findOne(
+			{ guildid: guildid },
+			{ channelid: 1, _id: 0 } // projection: only return channelid
+		);
+
+		if (!result) {
+			return { success: false, message: 'No record found for this guild.' };
+			}
+
+		return { success: true, channelid: result.channelid };
+	} catch (err) {
+		console.error('Error retrieving channel ID:', err);
+		return { success: false, message: 'Database error', error: err.message };
 	}
 });
 

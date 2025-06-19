@@ -8,7 +8,7 @@ const searchSchema = Joi.object({
   options: Joi.object().default({})
 });
 
-const searchInDatabase = async (input) => {
+const dbsearch = async (input) => {
   const { error, value } = searchSchema.validate(input);
   if (error) {
     return { success: false, error: 'Validation Error: ' + error.message };
@@ -37,4 +37,4 @@ const searchInDatabase = async (input) => {
   }
 };
 
-module.exports = searchInDatabase;
+module.exports = dbsearch;

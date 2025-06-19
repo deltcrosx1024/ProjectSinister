@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Client } = require('mongodb');
 const {mongodb_uri} = require('../config.json');
 
 let isConnected = false;
