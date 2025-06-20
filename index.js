@@ -71,7 +71,7 @@ discord_clients.on('messageCreate', async message => {
 
 		// Find the document where guildid matches, return only channelid
 		const result = await Model.findOne(
-			{ database: 'test' }, // Adjust the query to match your database and collection
+			{ database: 'test.serverinputs' }, // Adjust the query to match your database and collection
 			{ guildid: guildid },
 			{ channelid: 1, _id: 0 } // projection: only return channelid
 		);
@@ -82,8 +82,9 @@ discord_clients.on('messageCreate', async message => {
 
 		else{
 			try {
-				if (message.author.bot) return;
-    			if (message.channel.id !== result.channelid ) return;
+				if (message.author.bot) return { success: false, message: 'Message from bot ignored.' } && console.log(`Ignoring message from bot in guild ${guildid}`);
+				if (!message.guild) return { success: false, message: 'Message not from a guild.' } && console.log(`Ignoring non-guild message in guild ${guildid}`);
+    			if (message.channel.id !== result.channelid ) return { success: false, message: 'Message not in the specified channel.' } && console.log(`Ignoring message in wrong channel for guild ${guildid}`);
 				return { success: true, channelid: result.channelid, message: 'Channel ID retrieved successfully.' } && console.log(`Channel ID for guild ${guildid} is ${result.channelid}`);
 			} catch (err) {
 				console.error('Error processing message:', err);

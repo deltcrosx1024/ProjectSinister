@@ -4,6 +4,3 @@ node_modules/
 
 #sensitive environment file
 config.json
-
-#miscellaneous
-todolist.txt
