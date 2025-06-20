@@ -11,7 +11,7 @@ const searchSchema = Joi.object({
 const dbsearch = async (input) => {
   const { error, value } = searchSchema.validate(input);
   if (error) {
-    return { success: false, error: 'Validation Error: ' + error.message };
+    return { success: false, error: 'Validation Error: ' + error.message} && console.error('Validation Error:', error.message);
   }
 
   const { collectionName, query, options } = value;
@@ -30,10 +30,10 @@ const dbsearch = async (input) => {
 
     const results = await model.find(query, null, options).lean();
 
-    return { success: true, data: results };
+    return { success: true, data: results } && console.log(`Search successful in collection ${collectionName}`, results);
   } catch (err) {
     console.error('Search error:', err);
-    return { success: false, error: err.message };
+    return { success: false, error: err.message } && console.error('Error during search:', err.message);
   }
 };
 

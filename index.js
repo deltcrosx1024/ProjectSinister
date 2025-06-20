@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 //setup the token of both Discord Bot and OpenAI API Key
 const { token } = require('./config.json');
+const { error } = require('console');
 
 dbconnect();
 
@@ -51,33 +52,45 @@ discord_clients.on('interactionCreate', async interaction => {
 });
 
 const ServerInputSchema = new mongoose.Schema({
-  guildid: { type: String, required: true },
-  channelid: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now }
+	database: { type: String, required: true },
+	guildid: { type: String, required: true },
+	channelid: { type: String, required: true },
+	timestamp: { type: Date, default: Date.now }
 });
 
-const Model = mongoose.model('ServerFetch', ServerInputSchema);
+const Model = mongoose.model('ServerInputs', ServerInputSchema);
 
 //AI Interactions
 discord_clients.on('messageCreate', async message => {
+
+
 	try {
 		await dbconnect();
 
 		let guildid = message.guild.id;
 
-		const collections = database.collection('ServerInputs');
-
 		// Find the document where guildid matches, return only channelid
-		const result = await dbconnect(collections).findOne(
+		const result = await Model.findOne(
+			{ database: 'test' }, // Adjust the query to match your database and collection
 			{ guildid: guildid },
 			{ channelid: 1, _id: 0 } // projection: only return channelid
 		);
 
 		if (!result) {
-			return { success: false, message: 'No record found for this guild.' };
+			return { success: false, message: 'No record found for this guild.' } && console.error(`No record found for guild ${guildid}`);
 			}
 
-		return { success: true, channelid: result.channelid };
+		else{
+			try {
+				if (message.author.bot) return;
+    			if (message.channel.id !== result.channelid ) return;
+				return { success: true, channelid: result.channelid, message: 'Channel ID retrieved successfully.' } && console.log(`Channel ID for guild ${guildid} is ${result.channelid}`);
+			} catch (err) {
+				console.error('Error processing message:', err);
+				return { success: false, message: 'Error processing message', error: err.message } && console.error(`Error processing message in guild ${guildid}:`, err);
+			}
+		}
+
 	} catch (err) {
 		console.error('Error retrieving channel ID:', err);
 		return { success: false, message: 'Database error', error: err.message };
