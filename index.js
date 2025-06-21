@@ -53,6 +53,7 @@ discord_clients.on('interactionCreate', async interaction => {
 
 const ServerInputSchema = new mongoose.Schema({
 	database: { type: String, required: true },
+	from: { type: String, required: true }, // Adjust the query to match your database and collection
 	guildid: { type: String, required: true },
 	channelid: { type: String, required: true },
 	timestamp: { type: Date, default: Date.now }
@@ -71,13 +72,14 @@ discord_clients.on('messageCreate', async message => {
 
 		// Find the document where guildid matches, return only channelid
 		const result = await Model.findOne(
-			{ database: 'test.serverinputs' }, // Adjust the query to match your database and collection
+			{ database: 'test' },
+			{ from: 'serverinputs' }, // Adjust the query to match your database and collection
 			{ guildid: guildid },
 			{ channelid: 1, _id: 0 } // projection: only return channelid
 		);
 
 		if (!result) {
-			return { success: false, message: 'No record found for this guild.' } && console.error(`No record found for guild ${guildid}`);
+			return { success: false, message: 'No record found for this guild.', error: error.message } && console.error(`No record found for guild ${guildid} \n Error: ${error.message}`);
 			}
 
 		else{
