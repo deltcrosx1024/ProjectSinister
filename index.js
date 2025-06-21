@@ -71,7 +71,7 @@ discord_clients.on('messageCreate', async message => {
 		let guildid = message.guild.id;
 
 		// Find the document where guildid matches, return only channelid
-		const result = await Model.findOne(
+		let result = await Model.findOne(
 			{ database: 'test' },
 			{ from: 'serverinputs' }, // Adjust the query to match your database and collection
 			{ guildid: guildid },
