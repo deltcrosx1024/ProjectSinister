@@ -51,7 +51,7 @@ discord_clients.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 });
 
-const ServerInputSchema = new mongoose.Schema({
+let ServerInputSchema = new mongoose.Schema({
 	database: { type: String, required: true },
 	from: { type: String, required: true }, // Adjust the query to match your database and collection
 	guildid: { type: String, required: true },
@@ -73,21 +73,23 @@ discord_clients.on('messageCreate', async message => {
 		// Find the document where guildid matches, return only channelid
 		let result = await Model.findOne(
 			{ database: 'test' },
-			{ from: 'serverinputs' }, // Adjust the query to match your database and collection
+			{ from: 'ServerInputs' },
 			{ guildid: guildid },
 			{ channelid: 1, _id: 0 } // projection: only return channelid
 		);
 
+		await result;
+
 		if (!result) {
 			return { success: false, message: 'No record found for this guild.', error: error.message } && console.error(`No record found for guild ${guildid} \n Error: ${error.message}`);
-			}
+		}
 
 		else{
 			try {
 				if (message.author.bot) return { success: false, message: 'Message from bot ignored.' } && console.log(`Ignoring message from bot in guild ${guildid}`);
 				if (!message.guild) return { success: false, message: 'Message not from a guild.' } && console.log(`Ignoring non-guild message in guild ${guildid}`);
     			if (message.channel.id !== result.channelid ) return { success: false, message: 'Message not in the specified channel.' } && console.log(`Ignoring message in wrong channel for guild ${guildid}`);
-				return { success: true, channelid: result.channelid, message: 'Channel ID retrieved successfully.' } && console.log(`Channel ID for guild ${guildid} is ${result.channelid}`);
+				return { success: true, channelid: result.channelid, messag: 'Channel ID retrieved successfully.' } && console.log(`Channel ID for guild ${guildid} is ${result.channelid}`);
 			} catch (err) {
 				console.error('Error processing message:', err);
 				return { success: false, message: 'Error processing message', error: err.message } && console.error(`Error processing message in guild ${guildid}:`, err);
