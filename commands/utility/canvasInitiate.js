@@ -4,7 +4,6 @@ const { Canvas, loadImage, createCanvas, } = require('canvas');
 const fs = require('fs');
 const path = require('path');
 const { create } = require('domain');
-let font = canvas.registerFont(path.join(__dirname, 'fonts', 'HornetDisplay-Regular.ttf'), { family: 'Hornet Display Regular' });
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,6 +34,10 @@ module.exports = {
         // Create a new canvas
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext('2d');
+
+        //set fonts family
+        const file = path.join(__dirname, '../assets/fonts/HornetDisplay-Regular.ttf');
+        ctx.registerFont(file, { family: 'Hornet Display Regular' });
         // Set the background color
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, 0, width, height);

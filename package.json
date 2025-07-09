@@ -1,4 +1,12 @@
 {
+  "name": "project-sinister",
+  "version": "0.3.2-beta",
+  "description": "A Discord bot that uses OpenAI's API to generate images and text.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "pm2 start index.js"
+  },
   "dependencies": {
     "canvas": "^3.1.2",
     "discord.js": "^14.14.1",
