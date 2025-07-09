@@ -1,5 +1,5 @@
 {
-  "name": "project-sinister",
+  "namespace": "project-sinister",
   "version": "0.4.0-beta",
   "description": "A Discord bot that uses OpenAI's API to generate images and text.",
   "main": "index.js",

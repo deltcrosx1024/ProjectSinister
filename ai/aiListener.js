@@ -2,7 +2,16 @@ import OpenAI from 'openai'; // Import the OpenAI library to interact with the O
 import 'dotenv/config'; // Import dotenv to load environment variables from .env file
 
 const openai_key = process.env.OPENAI_KEY; // Get the OpenAI API key from environment variables
-console.log('loading OpenAI API key:', openai_key); // Log the OpenAI API key for debugging purposes
+
+function maskPartialKey(key) {
+  if (!key || key.length <= 8) return '***'; // fallback for short keys
+  const visibleStart = key.slice(0, 3);
+  const maskedPart = '*'.repeat(key.length - 3);
+  return visibleStart + maskedPart;
+}
+
+console.log('Loading OpenAI key:', openai_key ? 'Yes' : 'No'); // Log whether the OpenAI key is loaded
+console.log('OpenAI key:', maskPartialKey(openai_key)); // Log the OpenAI key with masking for security
 
 const openai = new OpenAI({
   apiKey: openai_key,
