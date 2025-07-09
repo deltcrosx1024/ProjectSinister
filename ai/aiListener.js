@@ -1,5 +1,7 @@
-const { OpenAI } = require('openai');
-const { openai_key } = require('../config.json');
+import OpenAI from 'openai'; // Import the OpenAI library to interact with the OpenAI API
+import config from '../config.json' assert {type: "json"}; // Import the configuration file
+
+const openai_key = config.openai_api_key; // Get the OpenAI API key from the configuration file
 
 const openai = new OpenAI({
   apiKey: openai_key,

@@ -1,6 +1,9 @@
-const mongoose = require('mongoose');
-const { Client } = require('mongodb');
-const {mongodb_uri} = require('../config.json');
+import mongoose from 'mongoose';
+import { Client } from 'mongodb' ;
+import config from '../config.json' assert {type: "json"}; // Import config file for MongoDB URI
+const mongodb_uri = config.mongodb_uri; // Get MongoDB URI from config file
+
+let db; // Variable to hold the database connection
 
 let isConnected = false;
 

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Joi from "joi";
 
 const serverSetupInputSchema = new mongoose.Schema({
     guildid: { type: String, required: true },

@@ -1,4 +1,4 @@
-const { Events, ActivityType } = require('discord.js');
+import { Events, ActivityType } from 'discord.js'; //import necessary classes from Discord.js to use
 
 module.exports = {
 	name: Events.ClientReady,

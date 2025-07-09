@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const Joi = require('joi');
-const dbconnect = require('./dbconnect'); // Mongoose connection module
+import mongoose from 'mongoose'; // Import mongoose for database operations
+import Joi from 'joi'; // Import Joi for input validation
+import dbconnect from './dbconnect.js' // Mongoose connection module
 
 const searchSchema = Joi.object({
   collectionName: Joi.string().min(1).required(),

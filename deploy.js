@@ -1,7 +1,11 @@
-const { REST, Routes } = require('discord.js');
-const fs = require('node:fs');
-const path = require('node:path');
-const { token, appid } = require('./config.json');
+import { REST, Routes } from 'discord.js';// Import necessary classes from discord.js to interact with Discord's API
+// Import the necessary classes for deploying commands
+import fs from 'fs'; // Import the file system module to read command files
+import path from 'path'; // Import the path module to handle file paths
+import config from './config.json' assert {type: "json"}; // Import the bot token and application ID from the config file
+
+const token = config.token; // Set the token variable to the token from config file
+const appid = config.appid; // Set the application ID variable to the app ID from config file
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier

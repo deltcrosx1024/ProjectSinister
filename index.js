@@ -8,9 +8,12 @@ const dbconnect = import('./db/dbconnect.js'); //import database connection
 const mongoose = import('mongoose'); //import mongoose for database operations
 
 //setup the token of both Discord Bot and OpenAI API Key
-import { token, openai_key } from './config.json' with {type: "json"}; //import the token and API key from config file
+import config from './config.json' assert {type: "json"}; //import the token and API key from config file
 import error from 'console';
 import { Db, ServerOpeningEvent } from 'mongodb'; //import mongodb classes for database operations
+
+const token = config.token; //set the token variable to the token from config file
+const openai_api_key = config.openai_api_key; //set the OpenAI API key variable to the key from config file
 
 dbconnect();
 

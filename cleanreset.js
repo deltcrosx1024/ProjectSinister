@@ -1,5 +1,8 @@
-const { REST, Routes } = require('discord.js');
-const { appid, token } = require('./config.json');
+import { REST, Routes } from 'discord.js'; // Import necessary classes from discord.js to interact with Discord's API
+import config from './config.json' assert {type: "json"}; // Import the bot token and application ID from the config file
+
+const token = config.token; // Set the token variable to the token from config file
+const appid = config.appid; // Set the application ID variable to the app ID from config file   
 
 const rest = new REST({ version: '10' }).setToken(token);
 

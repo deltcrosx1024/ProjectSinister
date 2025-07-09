@@ -1,4 +1,4 @@
-const { Events, MessageFlags } = require('discord.js');
+import { Events, MessageFlags } from 'discord.js'; // Import necessary classes from discord.js
 
 module.exports = {
 	name: Events.InteractionCreate,

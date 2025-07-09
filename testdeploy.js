@@ -1,8 +1,11 @@
-const { REST, Routes } = require('discord.js');
-const fs = require('node:fs');
-const path = require('node:path');
-const { token, appid } = require('./config.json');
-const prompt = require('readline-sync');
+import { REST, Routes } from 'discord.js';
+import fs from 'node:fs'; // Import the file system module to read files and directories
+import path from 'node:path'; // Import the path module to handle file paths
+import config from './config.json' assert {type: "json"}; // Import the token and application ID from the config file
+import prompt from 'readline-sync'; // Import prompt-sync for user input in the terminal
+
+const token = config.token; // Set the token variable to the token from config file
+const appid = config.appid; // Set the application ID variable to the app ID from config file
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier

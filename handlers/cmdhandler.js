@@ -1,6 +1,7 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentbits } = require('discord.js');
+import fs from 'node:fs';
+import { AttachmentBuilder } from 'discord.js'; // Import AttachmentBuilder to create attachments for Discord messages
+import path from 'node:path'; // Import path to handle file paths
+import { Client, Collection, Events } from 'discord.js'; // Import necessary classes from discord.js
 
 const client = new Client({ intents: [3276799] });
 

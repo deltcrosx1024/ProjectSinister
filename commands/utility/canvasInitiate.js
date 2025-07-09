@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
-const { Canvas, loadImage, createCanvas, } = require('canvas');
+import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } from 'discord.js'; // Import necessary classes from discord.js
+import { createCanvas } from 'canvas'; // Import createCanvas from canvas module to create a canvas
 
 const fs = require('fs');
 const path = require('path');

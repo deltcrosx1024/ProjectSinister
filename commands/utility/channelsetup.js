@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
-const mongoose = require('mongoose');
-const SaveServerInput = require('../../db/dbadd');
+import { SlashCommandBuilder } from 'discord.js'; // Import necessary classes from discord.js
+import mongoose from 'mongoose';
+import SaveServerInput from '../../db/dbadd.js'; // Import the model to save server input
 
 module.exports = {
     data: new SlashCommandBuilder()

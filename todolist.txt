@@ -1,0 +1,15 @@
+refactored files:
+index.js,
+dbconnect.js,
+dbadd.js,
+canvasinitiate.js,
+channelsetup.js,
+dbpermadd.js,
+dbsearch.js,
+evthandler.js,
+evtinteraction.js,
+cmdhandler.js,
+deploy.js,
+testdeploy.js,
+cleanreset.js,
+aiListener.js

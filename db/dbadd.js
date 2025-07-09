@@ -1,8 +1,9 @@
  // saveToMongo.js
-const mongoose = require('mongoose');
-const Joi = require('joi');
-const dbconnect = require('./dbconnect');
-const serversetupinput = require('./models/serversetupinput');
+import mongoose from 'mongoose';
+import Joi from 'joi';
+import { Collection } from 'mongodb';
+import dbconnect from './db/dbconnect.js'; // Import the database connection function
+import serversetupinput from './db/models/serversetupinput.js'; // Import the Mongoose model
 
 // The function to be called from your slash command
 async function SaveServerInput({ guildid, channelid }) {
