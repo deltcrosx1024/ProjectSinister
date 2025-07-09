@@ -11,9 +11,25 @@ import config from './config.json' with {type: "json"}; //import the token and A
 import error from 'console';
 import { Db, ServerOpeningEvent } from 'mongodb'; //import mongodb classes for database operations
 import { fileURLToPath, pathToFileURL } from 'url';
+import OpenAI from 'openai'; // Import the OpenAI library to interact with the OpenAI API
+import 'dotenv/config'; // Import dotenv to load environment variables from .env file
 
 const token = config.token; //set the token variable to the token from config file
-const openai_api_key = config.openai_api_key; //set the OpenAI API key variable to the key from config file
+const openai_key = process.env.OPENAI_KEY; // Get the OpenAI API key from environment variables
+			
+function maskPartialKey(key) {
+	if (!key || key.length <= 8) return '***'; // fallback for short keys
+	const visibleStart = key.slice(0, 3);
+	const maskedPart = '*'.repeat(key.length - 3);
+	return visibleStart + maskedPart;
+}
+
+console.log('Loading OpenAI key:', openai_key ? 'Yes' : 'No'); // Log whether the OpenAI key is loaded
+console.log('OpenAI key:', maskPartialKey(openai_key)); // Log the OpenAI key with masking for security
+
+const openai = new OpenAI({
+	apiKey: openai_key,
+});
 
 dbconnect();
 
@@ -60,6 +76,7 @@ for (const file of eventFiles) {
 }
 
 import './ai/aiListener.js'; //import AI listener module to handle AI interactions
+// import aiListener from './ai/aiListener.js';
 
 //command Interaction
 discord_clients.on('interactionCreate', async interaction => {
@@ -68,7 +85,7 @@ discord_clients.on('interactionCreate', async interaction => {
 
 //AI Interactions
 discord_clients.on('messageCreate', async message => {
-
+	console.log(`Received message in guild ${message.guild ? message.guild.id : 'DM'}: ${message.content}`); // Log the message content and guild ID
 
 	try {
 		await dbconnect();
@@ -88,20 +105,36 @@ discord_clients.on('messageCreate', async message => {
 		}
 
 		else{
+				
+			if (message.author.bot) return { success: false, message: 'Message from bot ignored.' } && console.log(`Ignoring message from bot in guild ${guildid}`);
+			if (!message.guild) return { success: false, message: 'Message not from a guild.' } && console.log(`Ignoring non-guild message in guild ${guildid}`);
+			if (message.channel.id !== result.channelid ) return { success: false, message: 'Message not in the specified channel.' } && console.log(`Ignoring message in wrong channel for guild ${guildid}`);
+			console.log(`Processing message in guild ${guildid}...`); // Log the guild ID being processed
+		
 			try {
-				if (message.author.bot) return { success: false, message: 'Message from bot ignored.' } && console.log(`Ignoring message from bot in guild ${guildid}`);
-				if (!message.guild) return { success: false, message: 'Message not from a guild.' } && console.log(`Ignoring non-guild message in guild ${guildid}`);
-    			if (message.channel.id !== result.channelid ) return { success: false, message: 'Message not in the specified channel.' } && console.log(`Ignoring message in wrong channel for guild ${guildid}`);
-				return { success: true, channelid: result.channelid, messag: 'Channel ID retrieved successfully.' } && console.log(`Channel ID for guild ${guildid} is ${result.channelid}`);
+				//setup the basic response for OpenAI
+				const response = await openai.chat.completions.create({
+					model: "gpt-4o",
+					messages: [
+						{ role: "user", content: message.content }
+					],
+				});
+		
+				const reply = response.choices[0].message.content || 'No response from AI.'; // Ensure there's a fallback if no content is returned
+				console.log(`AI response: ${reply}`); // Log the AI response for debugging purposes
+		
+				// Send the AI response back to the Discord channel
+				// Using message.reply to send a reply directly to the user
+				// If you want to send a normal message, use message.channel.send(reply);
+				await message.channel.send("test reply");
 			} catch (err) {
-				console.error('Error processing message:', err);
-				return { success: false, message: 'Error processing message', error: err.message } && console.error(`Error processing message in guild ${guildid}:`, err);
+				console.error('OpenAI error:', err);
+				message.reply('Sorry, I had trouble getting a response from OpenAI.');
 			}
-		}
-
+		} // Call the AI listener function with the Discord client
 	} catch (err) {
-		console.error('Error retrieving channel ID:', err);
-		return { success: false, message: 'Database error', error: err.message };
+			console.error('Error processing message:', err);
+			return { success: false, message: 'Error processing message', error: err.message } && console.error(`Error processing message in guild ${guildid}:`, err);
 	}
 });
 
