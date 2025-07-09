@@ -1,11 +1,10 @@
 import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } from 'discord.js'; // Import necessary classes from discord.js
 import { createCanvas } from 'canvas'; // Import createCanvas from canvas module to create a canvas
 
-const fs = require('fs');
-const path = require('path');
-const { create } = require('domain');
+import fs from 'fs'; // Import file system module to handle file operations
+import path from 'path'; // Import path module to handle file paths
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName('canvasinitiate')
         .setDescription('Initiate a canvas for drawing or image manipulation.')
@@ -76,7 +75,6 @@ module.exports = {
                 console.log(`File ${filePath} deleted successfully.`);
             }
         });
-    }  
+    }
 };
-
 // Note: Ensure that the necessary permissions are set for the bot to send messages and attachments in the channel where this command is used.

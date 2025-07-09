@@ -1,7 +1,7 @@
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs'; // Import the file system module to read files and directories
 import path from 'node:path'; // Import the path module to handle file paths
-import config from './config.json' assert {type: "json"}; // Import the token and application ID from the config file
+import config from './config.json' with {type: "json"}; // Import the token and application ID from the config file
 import prompt from 'readline-sync'; // Import prompt-sync for user input in the terminal
 
 const token = config.token; // Set the token variable to the token from config file

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { Client } from 'mongodb' ;
-import config from '../config.json' assert {type: "json"}; // Import config file for MongoDB URI
+import Client from 'mongodb' ;
+import config from '../config.json' with {type: "json"}; // Import config file for MongoDB URI
 const mongodb_uri = config.mongodb_uri; // Get MongoDB URI from config file
 
 let db; // Variable to hold the database connection
@@ -19,4 +19,4 @@ const dbconnect = async () => {
     return mongoose;
 };
 
-module.exports = dbconnect;
+export default dbconnect;

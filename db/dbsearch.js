@@ -37,4 +37,4 @@ const dbsearch = async (input) => {
   }
 };
 
-module.exports = dbsearch;
+export default dbsearch;

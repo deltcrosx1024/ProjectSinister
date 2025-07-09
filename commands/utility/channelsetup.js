@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js'; // Import necessary classes fr
 import mongoose from 'mongoose';
 import SaveServerInput from '../../db/dbadd.js'; // Import the model to save server input
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
     .setName('channelsetup')
     .setDescription('setup channel for AI Response')

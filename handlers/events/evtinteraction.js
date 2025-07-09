@@ -1,6 +1,6 @@
 import { Events, MessageFlags } from 'discord.js'; // Import necessary classes from discord.js
 
-module.exports = {
+export default {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
 		if (!interaction.isChatInputCommand()) return;

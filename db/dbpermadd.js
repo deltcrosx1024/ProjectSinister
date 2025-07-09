@@ -29,4 +29,4 @@ async function SaveUserPermission({ userId, username, userpermission }) {
     }
 }
 
-module.exports = SaveUserPermission;
+export default SaveUserPermission;

@@ -3,14 +3,14 @@ import serversetupinput from './db/models/serversetupinput.js';
 const discord_clients = new Client({ intents: [3276799] }); //set up intents for bot to run flawlessly with administrative permissions
 import fs from 'fs'; //setup file system module
 import path from 'path' //setup path module
-const dbsearch = import('./db/dbsearch.js'); //connect database
-const dbconnect = import('./db/dbconnect.js'); //import database connection
-const mongoose = import('mongoose'); //import mongoose for database operations
-
+import dbsearch from './db/dbsearch.js'; //connect database
+import dbconnect from './db/dbconnect.js'; //import database connection function
+import mongoose from 'mongoose';//import mongoose for database operations
 //setup the token of both Discord Bot and OpenAI API Key
-import config from './config.json' assert {type: "json"}; //import the token and API key from config file
+import config from './config.json' with {type: "json"}; //import the token and API key from config file
 import error from 'console';
 import { Db, ServerOpeningEvent } from 'mongodb'; //import mongodb classes for database operations
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const token = config.token; //set the token variable to the token from config file
 const openai_api_key = config.openai_api_key; //set the OpenAI API key variable to the key from config file
@@ -19,6 +19,9 @@ dbconnect();
 
 //this line of code will be starting point for interaction part
 discord_clients.commands = new Collection();
+const __filename = fileURLToPath(import.meta.url); //get the current file name for path operations
+const __dirname = path.dirname(__filename); //get the current directory name for path operations
+
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -27,8 +30,11 @@ for (const folder of commandFolders) {
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
+		const fileUrl = pathToFileURL(filePath); // Convert file path to URL format for dynamic import
+		const command = (await import(fileUrl)).default; // Use dynamic import to load the command module
+		// Check if the command has the required properties
+		// 'data' for command data and 'execute' for the function to execute
+		if (command && 'data' in command && 'execute' in command) {
 			discord_clients.commands.set(command.data.name, command);
 		} else {
 			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
@@ -41,7 +47,11 @@ const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
+	const fileUrl = pathToFileURL(filePath); // Convert file path to URL format for dynamic import
+	// Dynamically import the event file
+	// Assuming each event file exports a default object with 'name' and 'execute' properties
+	// 'once' property indicates if the event should be registered as a one-time listener
+	const event = (await import(fileUrl)).default;
 	if (event.once) {
 		discord_clients.once(event.name, (...args) => event.execute(...args));
 	} else {
@@ -49,7 +59,7 @@ for (const file of eventFiles) {
 	}
 }
 
-require('./ai/aiListener.js')(discord_clients);
+import './ai/aiListener.js'; //import AI listener module to handle AI interactions
 
 //command Interaction
 discord_clients.on('interactionCreate', async interaction => {
@@ -62,14 +72,10 @@ discord_clients.on('messageCreate', async message => {
 
 	try {
 		await dbconnect();
+		const Db = mongoose.connection.db; //get the database connection
 
 		let guildid = message.guild.id;
-		Db.collection('serverinputs').findone({ guildid: guildid }, async (error, result) => {
-			if (error) {
-				console.error(`Error retrieving channel ID for guild ${guildid}:`, error);
-				return { success: false, message: 'Database error', error: error.message };
-			}
-		});
+		const result = await Db.collection('serverinputs').findOne({ guildid: guildid });
 
 		if (!result) {
 			result = await serversetupinput.findOne({ guildid: guildid });

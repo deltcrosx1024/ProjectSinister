@@ -2,7 +2,7 @@ import { REST, Routes } from 'discord.js';// Import necessary classes from disco
 // Import the necessary classes for deploying commands
 import fs from 'fs'; // Import the file system module to read command files
 import path from 'path'; // Import the path module to handle file paths
-import config from './config.json' assert {type: "json"}; // Import the bot token and application ID from the config file
+import config from './config.json' with {type: "json"}; // Import the bot token and application ID from the config file
 
 const token = config.token; // Set the token variable to the token from config file
 const appid = config.appid; // Set the application ID variable to the app ID from config file

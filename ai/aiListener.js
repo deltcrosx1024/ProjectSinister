@@ -1,22 +1,25 @@
 import OpenAI from 'openai'; // Import the OpenAI library to interact with the OpenAI API
-import config from '../config.json' assert {type: "json"}; // Import the configuration file
+import 'dotenv/config'; // Import dotenv to load environment variables from .env file
 
-const openai_key = config.openai_api_key; // Get the OpenAI API key from the configuration file
+const openai_key = process.env.OPENAI_KEY; // Get the OpenAI API key from environment variables
+console.log('loading OpenAI API key:', openai_key); // Log the OpenAI API key for debugging purposes
 
 const openai = new OpenAI({
   apiKey: openai_key,
 });
 
-module.exports = (client) => {
+async function aiListener(client) {
   client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
     if (message.channel.id !== process.env.CHANNEL_ID) return;
 
     try {
       //setup the basic response for OpenAI
-      const response = await openai_clients.responses.create({
-        model:"chatgpt-4o-latest",
-        input:"Setup your first word to interact with our bot"
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "user", content: "Setup your first word to interact with our bot" }
+        ],
       });
 
       const reply = response.choices[0].message.content;
@@ -27,3 +30,5 @@ module.exports = (client) => {
     }
   });
 };
+
+export default aiListener;

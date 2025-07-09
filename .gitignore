@@ -4,6 +4,7 @@ node_modules/
 
 #sensitive environment file
 config.json
+.env
 
 #miscellaneous
 todolist.txt
