@@ -1,14 +1,16 @@
-const {Client, GatewayIntentBits, Collection, messageLink} = require('discord.js'); //import certain classes from Discord.js to use
+import {Client, GatewayIntentBits, Collection, messageLink} from 'discord.js'; //import certain classes from Discord.js to use
+import serversetupinput from './db/models/serversetupinput.js';
 const discord_clients = new Client({ intents: [3276799] }); //set up intents for bot to run flawlessly with administrative permissions
-const fs = require('fs'); //setup file system module
-const path = require('path'); //setup path module
-const dbsearch = require('./db/dbsearch'); //connect database
-const dbconnect = require('./db/dbconnect.js');
-const mongoose = require('mongoose');
+import fs from 'fs'; //setup file system module
+import path from 'path' //setup path module
+const dbsearch = import('./db/dbsearch.js'); //connect database
+const dbconnect = import('./db/dbconnect.js'); //import database connection
+const mongoose = import('mongoose'); //import mongoose for database operations
 
 //setup the token of both Discord Bot and OpenAI API Key
-const { token } = require('./config.json');
-const { error } = require('console');
+import { token, openai_key } from './config.json' with {type: "json"}; //import the token and API key from config file
+import error from 'console';
+import { Db, ServerOpeningEvent } from 'mongodb'; //import mongodb classes for database operations
 
 dbconnect();
 
@@ -51,16 +53,6 @@ discord_clients.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 });
 
-let ServerInputSchema = new mongoose.Schema({
-	database: { type: String, required: true },
-	from: { type: String, required: true }, // Adjust the query to match your database and collection
-	guildid: { type: String, required: true },
-	channelid: { type: String, required: true },
-	timestamp: { type: Date, default: Date.now }
-});
-
-const Model = mongoose.model('ServerInputs', ServerInputSchema);
-
 //AI Interactions
 discord_clients.on('messageCreate', async message => {
 
@@ -69,14 +61,16 @@ discord_clients.on('messageCreate', async message => {
 		await dbconnect();
 
 		let guildid = message.guild.id;
+		Db.collection('serverinputs').findone({ guildid: guildid }, async (error, result) => {
+			if (error) {
+				console.error(`Error retrieving channel ID for guild ${guildid}:`, error);
+				return { success: false, message: 'Database error', error: error.message };
+			}
+		});
 
-		// Find the document where guildid matches, return only channelid
-		let result = await Model.findOne(
-			{ database: 'test' },
-			{ from: 'ServerInputs' },
-			{ guildid: guildid },
-			{ channelid: 1, _id: 0 } // projection: only return channelid
-		);
+		if (!result) {
+			result = await serversetupinput.findOne({ guildid: guildid });
+		}
 
 		await result;
 

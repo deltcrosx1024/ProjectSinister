@@ -2,23 +2,19 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const dbconnect = require('./dbconnect');
-
-// Define the schema
-const ServerConfigSchema = new mongoose.Schema({
-    guildid: { type: String, required: true },
-    channelid: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now },
-});
-
-// Create the model
-let serversetupinput = mongoose.model('ServerInput', ServerConfigSchema);
+const serversetupinput = require('./models/serversetupinput');
 
 // The function to be called from your slash command
 async function SaveServerInput({ guildid, channelid }) {
     try {
         await dbconnect();
         console.log('mongoose.connection.readyState:', mongoose.connection.readyState);
-        await serversetupinput.findOneAndUpdate(
+        const inputs = new serversetupinput({
+            guildid,
+            channelid,
+            timestamp: Date.now(),
+        });
+        await inputs.findOneAndUpdate(
         
             { guildid },
             { 
