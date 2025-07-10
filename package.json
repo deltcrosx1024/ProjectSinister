@@ -1,6 +1,6 @@
 {
-  "namespace": "project-sinister",
-  "version": "0.4.0-beta",
+  "name": "project-sinister",
+  "version": "v0.5.0-beta4-preview-1",
   "description": "A Discord bot that uses OpenAI's API to generate images and text.",
   "main": "index.js",
   "scripts": {
@@ -16,8 +16,8 @@
     "discord.js": "^14.21.0",
     "dotenv": "^16.5.0",
     "joi": "^17.13.3",
-    "mongodb": "^6.16.0",
-    "mongoose": "^8.14.2",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.16.2",
     "openai": "^4.96.0",
     "openai-agents": "^1.1.0",
     "readline-sync": "^1.4.10"

@@ -2,24 +2,24 @@ import { Events, MessageFlags } from 'discord.js'; // Import necessary classes f
 
 export default {
 	name: Events.InteractionCreate,
-	async execute(interaction) {
-		if (!interaction.isChatInputCommand()) return;
+	async execute(interactionMetadata) {
+		if (!interactionMetadata.isChatInputCommand()) return;
 
-		const command = interaction.client.commands.get(interaction.commandName);
+		const command = interactionMetadata.client.commands.get(interactionMetadata.commandName);
 
 		if (!command) {
-			console.error(`No command matching ${interaction.commandName} was found.`);
+			console.error(`No command matching ${interactionMetadata.commandName} was found.`);
 			return;
 		}
 
 		try {
-			await command.execute(interaction);
+			await command.execute(interactionMetadata);
 		} catch (error) {
 			console.error(error);
-			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+			if (interactionMetadataMetadata.replied || interactionMetadata.deferred) {
+				await interactionMetadata.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
 			} else {
-				await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+				await interactionMetadata.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
 			}
 		}
 	},

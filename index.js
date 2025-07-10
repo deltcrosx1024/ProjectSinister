@@ -76,8 +76,8 @@ import './ai/aiListener.js'; //import AI listener module to handle AI interactio
 // import aiListener from './ai/aiListener.js';
 
 //command Interaction
-discord_clients.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
+discord_clients.on('interactionCreate', async interactionMetadata => {
+    if (!interactionMetadata.isCommand()) return;
 });
 
 //AI Interactions
@@ -89,7 +89,7 @@ discord_clients.on('messageCreate', async message => {
 		const Db = mongoose.connection.db; //get the database connection
 
 		let guildid = message.guild.id;
-		const result = await Db.collection('serverinputs').findOne({ guildid: guildid });
+		const result = await Db.collection('serverinputs').findOne({ guildid: guildid,}, { projection: { channelid: 1 } }); //search for the guild ID in the database
 
 		await result;
 
@@ -116,26 +116,33 @@ discord_clients.on('messageCreate', async message => {
 						},						
 					})
 
-					const response = await ai.models.generateContent({
-						model: 'gemini-2.5-flash',
-						messages: [
-							{
-								role: 'user',
-								content: textInput,
-							},
-						],
-					});
+					try {
+						const response = await ai.models.generateContent({
+							model: 'gemini-2.5-flash',
+							contents: [ // Changed from 'messages' to 'contents'
+								{
+									role: 'user',
+									parts: [{ text: textInput }], // Changed from 'content' to 'parts' with 'text'
+								},
+							],
+						});
 
-
-					console.log(`gemini replied: ${response.text} `);
-					return message.channel.send(response.text); // Send the response text to the channel
+						console.log(`gemini replied: ${response.text} `);
+						// Assuming 'message' is accessible in this scope for 'message.channel.send'
+						return message.channel.send(response.text);
+					} catch (error) {
+						console.error('Error generating content from Gemini:', error);
+						message.channel.send(`Sorry, I encountered an error while generating content: \n ${error.message}`);
+						// Handle the error, perhaps send an error message to the user
+						// return message.channel.send("Sorry, I encountered an error trying to process your request.");
+					}
 				}
 
 				console.log(`user input: ${message.content}`); // Log the user input for debugging
 				generateContent(message.content); // Call the function to generate content using Google GenAI
 			} catch (err) {
-				console.error('OpenAI error:', err);
-				message.channel.send(`Sorry, I had trouble getting a response from OpenAI. \n${err.message}`); // Send an error message to the channel
+				console.error('error:', err);
+				message.channel.send(`Sorry I had problem with Google Vertex API. \n${err.message}`); // Send an error message to the channel
 			}
 		} // Call the AI listener function with the Discord client
 	} catch (err) {

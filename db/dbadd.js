@@ -1,7 +1,5 @@
  // saveToMongo.js
 import mongoose from 'mongoose';
-import Joi from 'joi';
-import { Collection } from 'mongodb';
 import dbconnect from './dbconnect.js'; // Import the database connection function
 import serversetupinput from './models/serversetupinput.js'; // Import the Mongoose model
 
@@ -10,19 +8,14 @@ async function SaveServerInput({ guildid, channelid }) {
     try {
         await dbconnect();
         console.log('mongoose.connection.readyState:', mongoose.connection.readyState);
-        const inputs = new serversetupinput({
-            guildid,
-            channelid,
-            timestamp: Date.now(),
-        });
-        await inputs.findOneAndUpdate(
-        
-            { guildid },
+        await serversetupinput.findOneAndUpdate(
+            
+            { guildid: guildid }, // Find the document by guildid
             { 
-                channelid,
+                channelid: channelid, // Update the channelid
                 timestamp: Date.now(),
             },
-            { new: true, upsert: true }
+            { new: true, upsert: true, setDefaultsOnInsert: true } // Update or insert the document
         );
         return { success: true, message: 'Data saved successfully.' };
     } catch (error) {
