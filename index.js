@@ -28,6 +28,59 @@ function maskPartialKey(key) {
 	return visibleStart + maskedPart;
 }
 
+// Somewhere accessible in index.js (e.g., near the top, after imports)
+function splitDiscordMessage(text, maxLength = 2000) {
+    if (text.length <= maxLength) {
+        return [text]; // No splitting needed
+    }
+
+    const parts = [];
+    let remainingText = text;
+
+    while (remainingText.length > 0) {
+        if (remainingText.length <= maxLength) {
+            parts.push(remainingText);
+            remainingText = ''; // All text processed
+            break;
+        }
+
+        let idealSplitPoint = maxLength;
+        const searchArea = remainingText.substring(0, maxLength);
+
+        // Attempt to find a good split point working backwards from maxLength
+        // 1. Prioritize double newlines (paragraph breaks)
+        let lastDoubleNewline = searchArea.lastIndexOf('\n\n');
+        // If a good double newline is found within a reasonable distance from the end
+        if (lastDoubleNewline !== -1 && lastDoubleNewline > maxLength * 0.75) {
+            idealSplitPoint = lastDoubleNewline + 2; // Include the \n\n
+        } else {
+            // 2. Then single newlines (line breaks)
+            let lastNewline = searchArea.lastIndexOf('\n');
+            // If a good single newline is found within a reasonable distance
+            if (lastNewline !== -1 && lastNewline > maxLength * 0.75) {
+                idealSplitPoint = lastNewline + 1; // Include the \n
+            } else {
+                // 3. Then try to split at a space to avoid breaking words (look near the end of the segment)
+                let lastSpace = searchArea.lastIndexOf(' ');
+                if (lastSpace !== -1 && lastSpace > maxLength * 0.9) { // Space found relatively close to maxLength
+                    idealSplitPoint = lastSpace + 1; // Split after the space
+                } else {
+                    // 4. Fallback: If no good natural break, just split at the maxLength
+                    idealSplitPoint = maxLength;
+                }
+            }
+        }
+
+        // Extract the current part and add to array
+        let currentPart = remainingText.substring(0, idealSplitPoint);
+        parts.push(currentPart);
+
+        // Update remainingText for the next iteration, trimming any leading whitespace
+        remainingText = remainingText.substring(idealSplitPoint).trimStart();
+    }
+    return parts;
+}
+
 dbconnect();
 
 //this line of code will be starting point for interaction part
@@ -126,10 +179,17 @@ discord_clients.on('messageCreate', async message => {
 								},
 							],
 						});
-
-						console.log(`gemini replied: ${response.text} `);
-						// Assuming 'message' is accessible in this scope for 'message.channel.send'
-						return message.channel.send(response.text);
+						let geminitext = response.text;
+						console.log(`gemini replied(first 100 char): ${geminitext.substring(0,100)}`);
+						
+						const messageParts = splitDiscordMessage(geminitext, 2000); // Split the response into parts if needed
+						for (const part of messageParts) {
+							// You can add a small delay here if you frequently send many messages to avoid Discord rate limits.
+							// For typical usage (2-3 messages), it's usually not necessary.
+							// await new Promise(resolve => setTimeout(resolve, 500)); // Example: 0.5 second delay
+							await message.channel.send(part);
+						}
+						// message.channel.send(geminitext); // Send the response to the channel
 					} catch (error) {
 						console.error('Error generating content from Gemini:', error);
 						message.channel.send(`Sorry, I encountered an error while generating content: \n ${error.message}`);
