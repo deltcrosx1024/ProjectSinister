@@ -5,31 +5,28 @@ import fs from 'fs'; //setup file system module
 import path from 'path' //setup path module
 import dbsearch from './db/dbsearch.js'; //connect database
 import dbconnect from './db/dbconnect.js'; //import database connection function
-import mongoose from 'mongoose';//import mongoose for database operations
+import mongoose, { model } from 'mongoose';//import mongoose for database operations
 //setup the token of both Discord Bot and OpenAI API Key
 import config from './config.json' with {type: "json"}; //import the token and API key from config file
 import error from 'console';
 import { Db, ServerOpeningEvent } from 'mongodb'; //import mongodb classes for database operations
 import { fileURLToPath, pathToFileURL } from 'url';
-import OpenAI from 'openai'; // Import the OpenAI library to interact with the OpenAI API
+import { GoogleGenAI } from '@google/genai';
 import 'dotenv/config'; // Import dotenv to load environment variables from .env file
+import pkg from '@google-cloud/aiplatform/build/protos/protos.js'; // Import Google Cloud AI Platform protos
+const { google } = pkg; // Destructure google from the imported protos
 
 const token = config.token; //set the token variable to the token from config file
-const openai_key = process.env.OPENAI_KEY; // Get the OpenAI API key from environment variables
-			
+const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT; // Get Google Cloud project ID from environment variable
+const GOOGLE_CLOUD_LOCATION = process.env.GOOGLE_CLOUD_LOCATION; // Get Google Cloud
+const googleApiKey = process.env.GOOGLE_API_KEY; // Get Google Cloud API key from environment variable
+
 function maskPartialKey(key) {
 	if (!key || key.length <= 8) return '***'; // fallback for short keys
 	const visibleStart = key.slice(0, 3);
 	const maskedPart = '*'.repeat(key.length - 3);
 	return visibleStart + maskedPart;
 }
-
-console.log('Loading OpenAI key:', openai_key ? 'Yes' : 'No'); // Log whether the OpenAI key is loaded
-console.log('OpenAI key:', maskPartialKey(openai_key)); // Log the OpenAI key with masking for security
-
-const openai = new OpenAI({
-	apiKey: openai_key,
-});
 
 dbconnect();
 
@@ -94,10 +91,6 @@ discord_clients.on('messageCreate', async message => {
 		let guildid = message.guild.id;
 		const result = await Db.collection('serverinputs').findOne({ guildid: guildid });
 
-		if (!result) {
-			result = await serversetupinput.findOne({ guildid: guildid });
-		}
-
 		await result;
 
 		if (!result) {
@@ -113,23 +106,36 @@ discord_clients.on('messageCreate', async message => {
 		
 			try {
 				//setup the basic response for OpenAI
-				const response = await openai.chat.completions.create({
-					model: "gpt-4o",
-					messages: [
-						{ role: "user", content: message.content }
-					],
-				});
-		
-				const reply = response.choices[0].message.content || 'No response from AI.'; // Ensure there's a fallback if no content is returned
-				console.log(`AI response: ${reply}`); // Log the AI response for debugging purposes
-		
-				// Send the AI response back to the Discord channel
-				// Using message.reply to send a reply directly to the user
-				// If you want to send a normal message, use message.channel.send(reply);
-				await message.channel.send("test reply");
+				async function generateContent(textInput) {
+					const ai = new GoogleGenAI({
+						vertexai: true,
+						project: GOOGLE_CLOUD_PROJECT,
+						location: GOOGLE_CLOUD_LOCATION,
+						googleAuthOptions: {
+							googleApplicationCredentials: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Path to your Google Application Credentials JSON file
+						},						
+					})
+
+					const response = await ai.models.generateContent({
+						model: 'gemini-2.5-flash',
+						messages: [
+							{
+								role: 'user',
+								content: textInput,
+							},
+						],
+					});
+
+
+					console.log(`gemini replied: ${response.text} `);
+					return message.channel.send(response.text); // Send the response text to the channel
+				}
+
+				console.log(`user input: ${message.content}`); // Log the user input for debugging
+				generateContent(message.content); // Call the function to generate content using Google GenAI
 			} catch (err) {
 				console.error('OpenAI error:', err);
-				message.reply('Sorry, I had trouble getting a response from OpenAI.');
+				message.channel.send(`Sorry, I had trouble getting a response from OpenAI. \n${err.message}`); // Send an error message to the channel
 			}
 		} // Call the AI listener function with the Discord client
 	} catch (err) {

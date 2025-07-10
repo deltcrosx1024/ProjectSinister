@@ -5,6 +5,8 @@ node_modules/
 #sensitive environment file
 config.json
 .env
+client_secret_1044208962750-elsm6qrbkn1usteuibar645023r2dv72.apps.googleusercontent.com.json
+application_default_credentials.json
 
 #miscellaneous
 todolist.txt

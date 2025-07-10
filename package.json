@@ -9,8 +9,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@google-cloud/aiplatform": "^4.2.0",
+    "@google/genai": "^1.8.0",
+    "@google/generative-ai": "^0.24.1",
     "canvas": "^3.1.2",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.21.0",
     "dotenv": "^16.5.0",
     "joi": "^17.13.3",
     "mongodb": "^6.16.0",
