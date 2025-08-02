@@ -16,10 +16,10 @@ import 'dotenv/config'; // Import dotenv to load environment variables from .env
 import pkg from '@google-cloud/aiplatform/build/protos/protos.js'; // Import Google Cloud AI Platform protos
 const { google } = pkg; // Destructure google from the imported protos
 
+
 const token = config.token; //set the token variable to the token from config file
 const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT; // Get Google Cloud project ID from environment variable
 const GOOGLE_CLOUD_LOCATION = process.env.GOOGLE_CLOUD_LOCATION; // Get Google Cloud
-const googleApiKey = process.env.GOOGLE_API_KEY; // Get Google Cloud API key from environment variable
 
 function maskPartialKey(key) {
 	if (!key || key.length <= 8) return '***'; // fallback for short keys
@@ -175,7 +175,7 @@ discord_clients.on('messageCreate', async message => {
 							contents: [ // Changed from 'messages' to 'contents'
 								{
 									role: 'user',
-									parts: [{ text: textInput }], // Changed from 'content' to 'parts' with 'text'
+									parts: [{ text: textInput }], // Changed from 'content' to 'parts' with 'text' 
 								},
 							],
 						});
